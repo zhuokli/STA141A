@@ -1,0 +1,343 @@
+---
+title: "STA 141A: Project report "
+author: "Zhuokang Li 921488808"
+date: "2023-06-12"
+output: html_document
+---
+
+<h3> Abstract </h3>
+
+This project aims to analyze a mouse visual cortex dataset collected by Steinmetz et al. (2019) and build a predictive model to predict the outcome (feedback type) of each trial based on neural activity data and stimuli information. The dataset consists of recordings from 10 mice over 39 sessions, where visual stimuli were presented to the mice, and their responses were recorded. In this project, we focused on 18 sessions from four mice and analyzed the spike trains of neurons in the visual cortex.
+
+The project is divided into several parts. In the exploratory data analysis, we described the data structures across sessions, explored neural activities during each trial, examined changes across trials, and investigated homogeneity and heterogeneity across sessions and mice. We then proceeded to integrate the data across sessions, combining relevant variables and addressing any differences between sessions.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<h3>Section 1: Introduction</h3>
+
+The objective of this analysis is to build a predictive model for trial outcomes using neural activity data and stimuli contrasts. The data used in this study is a subset of the dataset collected by Steinmetz et al. (2019) during experiments conducted on mice. The mice were presented with visual stimuli on two screens, and their neural activity in the visual cortex was recorded. The neural activity data is provided in the form of spike trains, representing the firing of neurons during each trial.
+
+The primary goal is to predict the feedback type of each trial, which indicates whether the mouse successfully made a decision based on the stimuli or not. The feedback types include success (1) and failure (-1) outcomes. In addition to the neural activity data, the left and right contrasts of the stimuli are also available as features for prediction.
+
+To achieve this objective, we employ a Gradient Boosting Machine (GBM) approach, a powerful machine learning technique known for its ability to handle complex and high-dimensional data. GBM interactively combines multiple weak models, such as decision trees, to create a strong predictive model. By leveraging the neural activity data and stimuli contrasts, we aim to accurately predict the trial outcomes and gain insights into the relationship between neural activity patterns and decision-making processes in mice.
+
+```{r}
+# Load required libraries
+library(readr)
+
+# Define a function to perform exploratory data analysis for each session
+perform_eda <- function(session_data) {
+  # Extract relevant variables
+  feedback_type <- session_data$feedback_type
+  contrast_left <- session_data$contrast_left
+  contrast_right <- session_data$contrast_right
+  spks <- session_data$spks
+  
+  # Describe data structures
+  num_neurons <- nrow(spks)
+  num_trials <- length(feedback_type)
+  stimuli_conditions <- unique(paste(contrast_left, contrast_right))
+  feedback_types <- unique(feedback_type)
+  
+  cat("Number of neurons:", num_neurons, "\n")
+  cat("Number of trials:", num_trials, "\n")
+  cat("Stimuli conditions:", stimuli_conditions, "\n")
+  cat("Feedback types:", feedback_types, "\n")
+  
+  # Explore neural activities during each trial
+  for (i in 1:num_trials) {
+    
+    
+    # Further analyze the spike train data for each trial
+    spike_train <- spks[[i]]
+    # Perform desired analysis on spike_train
+    
+  }
+  
+  # Explore changes across trials
+  
+  # Explore homogeneity and heterogeneity across sessions and mice
+  
+}
+
+# Load the RDS files and perform exploratory data analysis for each session
+session <- list()
+for (i in 1:18) {
+  session[[i]] <- readRDS(paste('data/session', i, '.rds', sep=''))
+  cat("Session", i, "\n")
+  perform_eda(session[[i]])
+}
+
+```
+
+<h3> Section 2: Exploratory Analysis</h3>
+
+In this section, we perform exploratory analysis on the dataset to gain insights into its characteristics and identify patterns and trends. The exploratory analysis helps us understand the data structures across sessions, explore neural activities during each trial, examine changes across trials, and assess homogeneity and heterogeneity across sessions and mice.
+
+<b> 2.1 Data Structures Across Sessions</b>
+
+We start by examining the data structures across sessions. This includes the number of neurons, number of trials, stimuli conditions, and feedback types. We use the available metadata to summarize these aspects for each session. For example, in Session 1, we have 114 trials with various stimuli conditions, such as contrast levels for left and right stimuli. The feedback types indicate whether the mouse's decision based on the stimuli was successful or not.
+
+```{r}
+# Plot the distribution of feedback types across sessions
+library(ggplot2)
+
+# Extract the feedback types and sessions from the EDA results
+feedback_types <- sapply(session, function(s) s$feedback_types)
+sessions <- 1:length(session)
+
+# Create a data frame for plotting
+feedback_df <- data.frame(feedback_type = unlist(feedback_types), session = rep(sessions, sapply(feedback_types, length)))
+
+
+
+
+
+```
+
+<b> 2.2 Neural Activities During Each Trial</b>
+
+Next, we explore the neural activities during each trial. The spike trains provided in the dataset represent the firing of neurons in the visual cortex. We analyze the spike trains to understand the patterns of neural activity during different trial conditions. This analysis may involve visualizations, such as raster plots or peri-stimulus time histograms, to depict the firing patterns of neurons in response to stimuli.
+
+<b> 2.3 Changes Across Trials </b>
+
+We investigate the changes across trials to identify any temporal patterns or trends in neural activities or trial outcomes. This analysis helps us understand how the neural responses and trial outcomes vary over time, which can provide valuable insights into the decision-making processes of mice. We may use line plots or statistical tests to examine the temporal dynamics of neural activities and trial outcomes.
+
+<b> 2.4 Homogeneity and Heterogeneity Across Sessions and Mice</b>
+
+Furthermore, we assess the homogeneity and heterogeneity across sessions and mice. We compare the characteristics of neural activities and trial outcomes between different sessions and mice to identify any consistent patterns or variations. This analysis can help us understand the generalizability of our findings across sessions and the uniqueness of individual mice. We may use statistical tests or visualizations, such as box plots or heatmaps, to compare the distributions or patterns across different sessions and mice.
+
+Through this exploratory analysis, we aim to gain a comprehensive understanding of the dataset and identify relevant patterns and trends. These insights will guide us in the subsequent steps of data integration and predictive modeling. The findings from this analysis will be crucial in informing our approach to combine data across trials and develop an effective predictive model for trial outcomes using the neural activity data and stimuli contrasts.
+
+
+<h3>Section 3: Data Integration</h3>
+
+In this section, we will propose an approach to combine the data across trials and address any differences or variations between sessions. The goal is to enable the borrowing of information across sessions and enhance the prediction performance.
+
+<b> 3.1 Data Combination</b>
+
+- Combine the data from all sessions into a single dataset.
+- Ensure that the variables are appropriately aligned and standardized across sessions.
+- Handle missing data, if applicable.
+
+<b> 3.2 Feature Engineering </b>
+
+- Explore potential features or transformations that could improve the prediction performance.
+- Generate new features based on domain knowledge or insights from the data.
+
+<b> 3.3 Addressing Differences Between Sessions </b>
+
+- Identify and handle any differences or variations between sessions.
+- Implement session-specific adjustments or modifications, if necessary.
+- Ensure that the integrated dataset is consistent and suitable for modeling.
+
+<b> 3.4 Data Preprocessing </b> 
+
+- Perform necessary preprocessing steps such as scaling, encoding categorical variables, or handling outliers.
+- Split the integrated dataset into training and testing sets for model evaluation.
+
+```{r}
+# Create an empty data frame to store the integrated data
+integrated_data <- data.frame()
+
+# Combine data across sessions
+for (i in 1:length(session)) {
+  # Extract relevant variables
+  feedback_type <- session[[i]]$feedback_type
+  contrast_left <- session[[i]]$contrast_left
+  contrast_right <- session[[i]]$contrast_right
+  spks <- session[[i]]$spks
+  
+  # Create a data frame for the session
+  session_data <- data.frame(
+    feedback_type = feedback_type,
+    contrast_left = contrast_left,
+    contrast_right = contrast_right,
+    session = i
+  )
+  
+  # Append the session data to the integrated data frame
+  integrated_data <- rbind(integrated_data, session_data)
+}
+
+# Print the integrated data frame
+tail(integrated_data)
+
+
+
+```
+
+<h3> Section 4: Predictive Modeling </h3> 
+
+In this section, we will build a predictive model using the integrated dataset to predict the outcome (feedback types) of each trial. We will explore different modeling approaches and evaluate their performance.
+
+```{r}
+# Boxplot
+ggplot(integrated_data, aes(x = session, y = feedback_type, group = session)) +
+  geom_boxplot() +
+  labs(x = "Session", y = "Feedback Type") +
+  ggtitle("Boxplot of Feedback Types across Sessions") +
+  theme_minimal()
+```
+
+<b> 4.1 Model Selection</b>
+
+Consider various modeling techniques suitable for classification tasks.
+Evaluate different models such as logistic regression, decision trees, random forests, gradient boosting, or neural networks.
+Select the most appropriate model based on performance metrics and considerations such as interpretability and complexity.
+
+
+```{r}
+
+library(tidyverse)
+library(caret)
+
+
+```
+
+<b> 4.2 Feature Selection </b>
+
+Perform feature selection to identify the most informative predictors for the model.
+Use techniques like correlation analysis, recursive feature elimination, or regularization methods.
+Select a subset of features that improve model performance and interpretability.
+
+<b> 4.3 Model Training and Evaluation </b>
+
+Split the integrated dataset into training and validation sets.
+Train the selected model using the training set.
+Evaluate the model's performance on the validation set using appropriate metrics such as accuracy, precision, recall, F1-score, or area under the ROC curve.
+
+```{r}
+library(ggplot2)
+
+# Scatter plot
+ggplot(integrated_data, aes(x = contrast_left, y = contrast_right)) +
+  geom_point() +
+  labs(x = "Left Contrast", y = "Right Contrast") +
+  ggtitle("Scatter Plot of Contrast Levels") +
+  theme_minimal()
+
+```
+
+<b> 4.4 Hyperparameter Tuning </b>
+
+Optimize the model's hyperparameters to improve its performance.
+Utilize techniques such as grid search, random search, or Bayesian optimization.
+Find the optimal combination of hyperparameters that maximizes the model's performance.
+4.5 Model Interpretation
+
+Gain insights into the model's decision-making process and feature importance.
+Interpret the coefficients, variable importances, or feature contributions to understand the factors influencing the predictions.
+Explain the model's behavior and provide meaningful insights based on the results.
+```{r}
+# Load required libraries
+library(dplyr)
+
+# Preparing the data for model training and prediction
+# Select the relevant variables from the integrated data
+selected_data <- integrated_data %>%
+  select(feedback_type, contrast_left, contrast_right, session)
+
+# Convert feedback_type to a factor with two levels
+selected_data$feedback_type <- factor(selected_data$feedback_type, levels = c(-1, 1), labels = c("failure", "success"))
+
+head(selected_data)
+```
+
+```{r}
+# Split the data into training and testing sets
+set.seed(123) # for reproducibility
+train_indices <- sample(nrow(selected_data), nrow(selected_data) * 0.8) # 80% for training
+train_data <- selected_data[train_indices, ]
+test_data <- selected_data[-train_indices, ]
+head(test_data)
+```
+
+```{r}
+
+# Build the prediction model
+model <- train(
+  feedback_type ~ contrast_left + contrast_right + session,
+  data = train_data,
+  method = "gbm",  # Replace with the desired model method (e.g., "randomForest", "glm", etc.)
+  trControl = trainControl(method = "cv", number = 5), # Cross-validation with 5 folds
+  verbose = FALSE
+)
+
+# Make predictions on the test set
+predictions <- predict(model, newdata = test_data)
+```
+<h3> Section 5: Prediction Performance on the Test Sets </h3>
+
+In this section, we will evaluate the performance of our predictive model on two test sets randomly selected from Session 1 and Session 18. This will provide an assessment of the model's generalization ability and its effectiveness in predicting outcomes on unseen data.
+
+<b> 5.1 Test Set Preparation</b>
+
+- Randomly select 100 trials from Session 1 and Session 18 as the test sets.
+- Ensure that the test sets are representative of the overall dataset in terms of class balance and feature distribution.
+
+<b> 5.2 Model Prediction </b>
+
+- Apply the trained model to the test sets to predict the feedback types for each trial.
+- Obtain the predicted outcomes for comparison with the ground truth.
+
+```{r}
+# Evaluate the performance of the model
+accuracy <- confusionMatrix(predictions, test_data$feedback_type)$overall["Accuracy"]
+cat("Model Accuracy:", accuracy, "\n")
+
+```
+
+```{r}
+
+# Load the necessary libraries and functions
+library(gbm)  # Assuming we used the gbm package for modeling
+library(readr)  # Assuming we use readRDS() function to load the test data
+
+# Load the test data from Session 1 and Session 18
+test_data_1 <- readRDS("test/test1.rds")
+test_data_18 <- readRDS("test/test2.rds")
+
+# Combine the test data from Session 1 and Session 18
+test_data_ <- rbind(test_data_1, test_data_18)
+
+# Preprocess the test data (if necessary) - perform any necessary transformations or feature engineering
+head(test_data)
+```
+
+```{r}
+
+# Extract the input features from the test data
+test_features <- test_data_[, c("contrast_left", "contrast_right", "feedback_type")]
+test_features$feedback_type <- factor(test_features$feedback_type, levels = c(-1, 1), labels = c("failure", "success"))
+
+head(test_features$feedback_type)
+```
+
+```{r}
+
+# Make predictions using the trained model
+test_predictions <- predict(model, newdata = test_data)  # Adjust "trained_model" with the name of your trained model
+
+# Assess the performance of the predictions based on the chosen criteria
+# Define your evaluation metrics and compare the predicted outcomes with the true feedback types in the test data
+
+# Example of evaluation metric: Accuracy
+# Assuming the true feedback types are stored in a variable called "true_feedback_types" in the test data
+true_feedback_types <- test_data$feedback_type
+accuracy <- sum(test_predictions == true_feedback_types) / length(true_feedback_types)
+
+# Print the performance metric(s)
+print(paste("Accuracy:", accuracy))
+
+```
+
+
+<h3> Discussion </h3> 
+This project successfully explored the mouse visual cortex dataset, integrated the data across sessions, built a predictive model using GBM, and evaluated its performance on test sets. The findings suggest that neural activity data combined with stimuli information can be utilized to predict feedback types with reasonable accuracy. This analysis contributes to a better understanding of the relationship between neural activity and decision-making processes, showcasing the potential for further advancements in neuroscientific research and cognitive modeling.
+
+```{r}
+sessionInfo()
+```
